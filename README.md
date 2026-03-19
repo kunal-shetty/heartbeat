@@ -2,7 +2,7 @@
 
 <br/>
 
-<img src="https://readme-typing-svg.demolab.com?font=Plus+Jakarta+Sans&weight=700&size=32&pause=1000&color=F59E0B&center=true&vCenter=true&width=435&lines=❤️+Heartbeat" alt="Heartbeat" />
+<img src="https://readme-typing-svg.demolab.com?font=Plus+Jakarta+Sans&weight=700&size=32&pause=1000&color=FFEB3B&center=true&vCenter=true&width=435&lines=%E2%9D%A4%EF%B8%8F+Heartbeat" alt="Heartbeat" />
 
 <br/>
 
