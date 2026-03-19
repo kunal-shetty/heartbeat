@@ -105,6 +105,8 @@ class AuthNewUserState extends AuthState {
 
 class AuthUnauthenticatedState extends AuthState {}
 
+class AuthSignUpPendingState extends AuthState {}
+
 class AuthErrorState extends AuthState {
   final String message;
   AuthErrorState(this.message);
@@ -206,15 +208,29 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       AuthSignUpWithEmailEvent event, Emitter<AuthState> emit) async {
     emit(AuthLoadingState());
     try {
-      final user = await signUpWithEmail(
+      await signUpWithEmail(
         email: event.email,
         password: event.password,
         username: event.username,
         displayName: event.displayName,
       );
-      emit(AuthAuthenticatedState(user));
+      // signUpWithEmail returns void; if no exception was thrown and we reach
+      // here it means the user was created AND a session was established
+      // (email confirmation is disabled). Try to get the current user.
+      final user = await getCurrentUser();
+      if (user != null) {
+        emit(AuthAuthenticatedState(user));
+      } else {
+        // Should not happen, but fallback
+        emit(AuthSignUpPendingState());
+      }
     } on AuthFailure catch (e) {
-      emit(AuthErrorState(e.message));
+      if (e.message == 'SIGNUP_PENDING') {
+        // Email confirmation required — tell user to sign in after confirming.
+        emit(AuthSignUpPendingState());
+      } else {
+        emit(AuthErrorState(e.message));
+      }
     } catch (e) {
       emit(AuthErrorState('Sign up failed. Try again.'));
     }

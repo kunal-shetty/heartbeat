@@ -20,59 +20,77 @@ class SplashScreen extends StatelessWidget {
         }
       },
       child: Scaffold(
-        backgroundColor: AppTheme.brandPrimary,
-        body: Center(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Container(
-                width: 96,
-                height: 96,
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(24),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withOpacity(0.15),
-                      blurRadius: 20,
-                      offset: const Offset(0, 8),
-                    ),
-                  ],
-                ),
-                child: const Icon(
-                  Icons.chat_bubble_rounded,
-                  color: AppTheme.brandPrimary,
-                  size: 52,
-                ),
-              )
-                  .animate()
-                  .scale(duration: 600.ms, curve: Curves.elasticOut)
-                  .fadeIn(duration: 300.ms),
-              const SizedBox(height: 20),
-              Text(
-               'Heartbeat',
-                style: Theme.of(context).textTheme.displayMedium?.copyWith(
-                      color: Colors.white,
-                      fontWeight: FontWeight.w800,
-                      letterSpacing: -0.5,
-                    ),
-              )
-                  .animate()
-                  .fadeIn(delay: 300.ms, duration: 400.ms)
-                  .slideY(begin: 0.3, end: 0),
-              const SizedBox(height: 8),
-              Text(
-                'Connect. Chat. Share.',
-                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                      color: Colors.white.withOpacity(0.8),
-                    ),
-              ).animate().fadeIn(delay: 500.ms, duration: 400.ms),
-              const SizedBox(height: 48),
-              const CircularProgressIndicator(
-                color: Colors.white,
-                strokeWidth: 2.5,
-              ).animate().fadeIn(delay: 600.ms),
-            ],
+        body: Container(
+          decoration: const BoxDecoration(
+            gradient: AppTheme.heroGradientVertical,
+          ),
+          child: Center(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                // Glowing icon with shadow
+                Container(
+                  width: 100,
+                  height: 100,
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(28),
+                    boxShadow: [
+                      BoxShadow(
+                        color: AppTheme.brandPink.withOpacity(0.45),
+                        blurRadius: 36,
+                        spreadRadius: 6,
+                        offset: const Offset(0, 10),
+                      ),
+                    ],
+                  ),
+                  child: const Icon(
+                    Icons.favorite_rounded,
+                    color: AppTheme.brandPink,
+                    size: 54,
+                  ),
+                )
+                    .animate()
+                    .scale(duration: 600.ms, curve: Curves.elasticOut)
+                    .fadeIn(duration: 300.ms),
+
+                const SizedBox(height: 24),
+
+                Text(
+                  'Heartbeat',
+                  style: Theme.of(context).textTheme.displayMedium?.copyWith(
+                        color: Colors.white,
+                        fontWeight: FontWeight.w900,
+                        fontSize: 36,
+                        letterSpacing: -0.5,
+                      ),
+                )
+                    .animate()
+                    .fadeIn(delay: 300.ms, duration: 400.ms)
+                    .slideY(begin: 0.3, end: 0),
+
+                const SizedBox(height: 8),
+
+                Text(
+                  'Connect. Chat. Share.',
+                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                        color: Colors.white.withOpacity(0.85),
+                      ),
+                ).animate().fadeIn(delay: 500.ms, duration: 400.ms),
+
+                const SizedBox(height: 56),
+
+                // Pulsing progress indicator
+                SizedBox(
+                  width: 28,
+                  height: 28,
+                  child: CircularProgressIndicator(
+                    color: Colors.white.withOpacity(0.8),
+                    strokeWidth: 2.5,
+                  ),
+                ).animate().fadeIn(delay: 600.ms),
+              ],
+            ),
           ),
         ),
       ),

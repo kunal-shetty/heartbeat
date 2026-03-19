@@ -6,7 +6,6 @@ import '../blocs/auth_bloc.dart';
 import '../../../../core/router/app_router.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../core/utils/extensions.dart';
-import '../widgets/auth_text_field.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -15,24 +14,7 @@ class LoginScreen extends StatefulWidget {
   State<LoginScreen> createState() => _LoginScreenState();
 }
 
-class _LoginScreenState extends State<LoginScreen>
-    with SingleTickerProviderStateMixin {
-  late TabController _tabController;
-  final _phoneController = TextEditingController();
-
-  @override
-  void initState() {
-    super.initState();
-    _tabController = TabController(length: 1, vsync: this);
-  }
-
-  @override
-  void dispose() {
-    _tabController.dispose();
-    _phoneController.dispose();
-    super.dispose();
-  }
-
+class _LoginScreenState extends State<LoginScreen> {
   @override
   Widget build(BuildContext context) {
     return BlocListener<AuthBloc, AuthState>(
@@ -48,81 +30,103 @@ class _LoginScreenState extends State<LoginScreen>
         }
       },
       child: Scaffold(
-        backgroundColor: AppTheme.brandPrimary,
-        body: SafeArea(
-          child: Column(
-            children: [
-              // ── Hero Section ─────────────────────────────────────────────
-              Expanded(
-                flex: 5,
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 32),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      // App icon
-                      Container(
-                        width: 100,
-                        height: 100,
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(28),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.black.withOpacity(0.18),
-                              blurRadius: 24,
-                              offset: const Offset(0, 10),
-                            ),
+        body: Container(
+          decoration: const BoxDecoration(
+            gradient: AppTheme.heroGradientVertical,
+          ),
+          child: SafeArea(
+            child: Column(
+              children: [
+                // ── Hero Section ─────────────────────────────────────────
+                Expanded(
+                  flex: 5,
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 32),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        // Glowing app icon
+                        Container(
+                          width: 96,
+                          height: 96,
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(28),
+                            boxShadow: [
+                              BoxShadow(
+                                color: AppTheme.brandPink.withOpacity(0.4),
+                                blurRadius: 30,
+                                spreadRadius: 4,
+                                offset: const Offset(0, 8),
+                              ),
+                            ],
+                          ),
+                          child: const Icon(
+                            Icons.favorite_rounded,
+                            color: AppTheme.brandPink,
+                            size: 52,
+                          ),
+                        )
+                            .animate()
+                            .scale(duration: 600.ms, curve: Curves.elasticOut)
+                            .fadeIn(duration: 300.ms),
+                        const SizedBox(height: 28),
+                        Text(
+                          'Heartbeat',
+                          style:
+                              Theme.of(context).textTheme.displayLarge?.copyWith(
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.w900,
+                                    fontSize: 38,
+                                    letterSpacing: -1,
+                                  ),
+                        )
+                            .animate()
+                            .fadeIn(delay: 300.ms, duration: 400.ms)
+                            .slideY(begin: 0.3, end: 0),
+                        const SizedBox(height: 10),
+                        Text(
+                          'Stay connected with the people\nthat matter most.',
+                          textAlign: TextAlign.center,
+                          style:
+                              Theme.of(context).textTheme.bodyLarge?.copyWith(
+                                    color: Colors.white.withOpacity(0.9),
+                                    height: 1.5,
+                                  ),
+                        ).animate().fadeIn(delay: 450.ms, duration: 400.ms),
+
+                        const SizedBox(height: 24),
+
+                        // Feature pills
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            _FeaturePill(
+                                icon: Icons.lock_outline, label: 'Private'),
+                            const SizedBox(width: 10),
+                            _FeaturePill(
+                                icon: Icons.bolt_rounded, label: 'Fast'),
+                            const SizedBox(width: 10),
+                            _FeaturePill(
+                                icon: Icons.people_outline, label: 'Groups'),
                           ],
-                        ),
-                        child: const Icon(
-                          Icons.favorite_rounded,
-                          color: AppTheme.brandPrimary,
-                          size: 52,
-                        ),
-                      )
-                          .animate()
-                          .scale(duration: 600.ms, curve: Curves.elasticOut)
-                          .fadeIn(duration: 300.ms),
-                      const SizedBox(height: 28),
-                      Text(
-                        'Heartbeat',
-                        style: Theme.of(context).textTheme.displayLarge?.copyWith(
-                              color: Colors.white,
-                              fontWeight: FontWeight.w900,
-                              fontSize: 38,
-                              letterSpacing: -1,
-                            ),
-                      )
-                          .animate()
-                          .fadeIn(delay: 300.ms, duration: 400.ms)
-                          .slideY(begin: 0.3, end: 0),
-                      const SizedBox(height: 10),
-                      Text(
-                        'Stay connected with the people\nthat matter most.',
-                        textAlign: TextAlign.center,
-                        style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                              color: Colors.white.withOpacity(0.85),
-                              height: 1.5,
-                            ),
-                      ).animate().fadeIn(delay: 450.ms, duration: 400.ms),
-                    ],
+                        ).animate().fadeIn(delay: 550.ms),
+                      ],
+                    ),
                   ),
                 ),
-              ),
 
-              // ── Bottom Card ──────────────────────────────────────────────
-              Expanded(
-                flex: 4,
-                child: Container(
+                // ── Bottom Card ──────────────────────────────────────────
+                Container(
                   width: double.infinity,
                   decoration: const BoxDecoration(
                     color: Colors.white,
                     borderRadius:
                         BorderRadius.vertical(top: Radius.circular(36)),
                   ),
-                  padding: const EdgeInsets.fromLTRB(28, 32, 28, 24),
+                  padding: const EdgeInsets.fromLTRB(28, 28, 28, 20),
                   child: Column(
+                    mainAxisSize: MainAxisSize.min,
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
                       // Drag handle
@@ -130,13 +134,13 @@ class _LoginScreenState extends State<LoginScreen>
                         child: Container(
                           width: 40,
                           height: 4,
-                          margin: const EdgeInsets.only(bottom: 28),
                           decoration: BoxDecoration(
                             color: AppTheme.neutral100,
                             borderRadius: BorderRadius.circular(2),
                           ),
                         ),
                       ),
+                      const SizedBox(height: 20),
 
                       Text(
                         'Get Started',
@@ -144,63 +148,55 @@ class _LoginScreenState extends State<LoginScreen>
                               fontWeight: FontWeight.w800,
                             ),
                       ).animate().fadeIn(delay: 300.ms),
-                      const SizedBox(height: 6),
+                      const SizedBox(height: 4),
                       Text(
-                        'Sign in to your account or create a new one.',
+                        'Sign in or create a new account.',
                         style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                               color: AppTheme.neutral400,
                             ),
                       ).animate().fadeIn(delay: 360.ms),
-                      const SizedBox(height: 28),
+                      const SizedBox(height: 22),
 
-                      // Sign In button
-                      ElevatedButton(
-                        onPressed: () => context.push(AppRoutes.signIn),
-                        style: ElevatedButton.styleFrom(
-                          minimumSize: const Size(double.infinity, 52),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(16),
-                          ),
-                        ),
-                        child: const Text('Sign In'),
+                      // Sign In button — gradient
+                      _GradientButton(
+                        label: 'Sign In',
+                        onTap: () => context.push(AppRoutes.signIn),
                       ).animate().fadeIn(delay: 420.ms).scale(
                           delay: 420.ms,
                           duration: 300.ms,
                           curve: Curves.easeOut),
-                      const SizedBox(height: 14),
+                      const SizedBox(height: 12),
 
                       // Create Account button
                       OutlinedButton(
                         onPressed: () => context.push(AppRoutes.register),
                         style: OutlinedButton.styleFrom(
-                          minimumSize: const Size(double.infinity, 52),
+                          minimumSize: const Size(double.infinity, 50),
                           side: const BorderSide(
-                              color: AppTheme.brandPrimary, width: 1.5),
+                              color: AppTheme.brandPink, width: 1.5),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(16),
                           ),
-                          foregroundColor: AppTheme.brandPrimary,
+                          foregroundColor: AppTheme.brandPink,
                         ),
                         child: Text(
                           'Create Account',
                           style:
                               Theme.of(context).textTheme.titleSmall?.copyWith(
-                                    color: AppTheme.brandPrimary,
+                                    color: AppTheme.brandPink,
                                     fontWeight: FontWeight.w700,
                                   ),
                         ),
                       ).animate().fadeIn(delay: 480.ms),
-                      const SizedBox(height: 20),
+                      const SizedBox(height: 12),
 
                       // Google sign in
                       OutlinedButton.icon(
-                        onPressed: () {
-                          context
-                              .read<AuthBloc>()
-                              .add(AuthSignInWithGoogleEvent());
-                        },
+                        onPressed: () => context
+                            .read<AuthBloc>()
+                            .add(AuthSignInWithGoogleEvent()),
                         style: OutlinedButton.styleFrom(
-                          minimumSize: const Size(double.infinity, 52),
+                          minimumSize: const Size(double.infinity, 50),
                           side: BorderSide(
                               color: AppTheme.neutral400.withOpacity(0.35)),
                           shape: RoundedRectangleBorder(
@@ -208,7 +204,7 @@ class _LoginScreenState extends State<LoginScreen>
                           ),
                         ),
                         icon: const Icon(Icons.g_mobiledata,
-                            size: 28, color: AppTheme.brandAccent),
+                            size: 28, color: AppTheme.brandOrange),
                         label: Text(
                           'Continue with Google',
                           style: Theme.of(context)
@@ -219,9 +215,10 @@ class _LoginScreenState extends State<LoginScreen>
                       ).animate().fadeIn(delay: 520.ms),
                     ],
                   ),
-                ).animate().slideY(begin: 0.25, end: 0, duration: 450.ms, delay: 100.ms),
-              ),
-            ],
+                ).animate().slideY(
+                    begin: 0.25, end: 0, duration: 450.ms, delay: 100.ms),
+              ],
+            ),
           ),
         ),
       ),
@@ -229,63 +226,71 @@ class _LoginScreenState extends State<LoginScreen>
   }
 }
 
-/// Phone-based OTP tab – kept for re-use if extended later
-class _PhoneTab extends StatelessWidget {
-  final TextEditingController controller;
-  const _PhoneTab({required this.controller});
+class _FeaturePill extends StatelessWidget {
+  final IconData icon;
+  final String label;
+  const _FeaturePill({required this.icon, required this.label});
 
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<AuthBloc, AuthState>(
-      builder: (context, state) {
-        final isLoading = state is AuthLoadingState;
-        return Padding(
-          padding: const EdgeInsets.all(24),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              const SizedBox(height: 8),
-              Text('Enter your phone number',
-                  style: Theme.of(context).textTheme.titleMedium),
-              const SizedBox(height: 6),
-              Text('We\'ll send you a verification code.',
-                  style: Theme.of(context)
-                      .textTheme
-                      .bodyMedium
-                      ?.copyWith(color: AppTheme.neutral400)),
-              const SizedBox(height: 24),
-              AuthTextField(
-                controller: controller,
-                hint: '+91 98765 43210',
-                prefixIcon: Icons.phone_outlined,
-                keyboardType: TextInputType.phone,
-                label: 'Phone number',
-              ),
-              const SizedBox(height: 20),
-              ElevatedButton(
-                onPressed: isLoading
-                    ? null
-                    : () {
-                        if (controller.text.isValidPhone) {
-                          context.read<AuthBloc>().add(
-                              AuthSignInWithPhoneEvent(controller.text.trim()));
-                        } else {
-                          context.showSnackBar('Enter a valid phone number',
-                              isError: true);
-                        }
-                      },
-                child: isLoading
-                    ? const SizedBox(
-                        width: 20,
-                        height: 20,
-                        child: CircularProgressIndicator(
-                            color: Colors.white, strokeWidth: 2))
-                    : const Text('Send OTP'),
-              ),
-            ],
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+      decoration: BoxDecoration(
+        color: Colors.white.withOpacity(0.2),
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: Colors.white.withOpacity(0.3)),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(icon, size: 14, color: Colors.white),
+          const SizedBox(width: 5),
+          Text(
+            label,
+            style: const TextStyle(
+              color: Colors.white,
+              fontSize: 12,
+              fontWeight: FontWeight.w600,
+            ),
           ),
-        );
-      },
+        ],
+      ),
+    );
+  }
+}
+
+class _GradientButton extends StatelessWidget {
+  final String label;
+  final VoidCallback onTap;
+  const _GradientButton({required this.label, required this.onTap});
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        height: 52,
+        decoration: BoxDecoration(
+          gradient: AppTheme.heroGradient,
+          borderRadius: BorderRadius.circular(16),
+          boxShadow: [
+            BoxShadow(
+              color: AppTheme.brandPink.withOpacity(0.35),
+              blurRadius: 12,
+              offset: const Offset(0, 4),
+            ),
+          ],
+        ),
+        alignment: Alignment.center,
+        child: Text(
+          label,
+          style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                color: Colors.white,
+                fontWeight: FontWeight.w700,
+                fontSize: 16,
+              ),
+        ),
+      ),
     );
   }
 }

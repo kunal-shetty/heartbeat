@@ -50,21 +50,49 @@ class _RegisterScreenState extends State<RegisterScreen> {
       listener: (context, state) {
         if (state is AuthAuthenticatedState) {
           context.go(AppRoutes.chatList);
+        } else if (state is AuthSignUpPendingState) {
+          // Email confirmation required
+          showDialog(
+            context: context,
+            barrierDismissible: false,
+            builder: (_) => AlertDialog(
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(20)),
+              title: const Text('Account Created! 🎉'),
+              content: const Text(
+                'Please check your email and confirm your account, then sign in.',
+              ),
+              actions: [
+                ElevatedButton(
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                    context.go(AppRoutes.signIn);
+                  },
+                  child: const Text('Go to Sign In'),
+                ),
+              ],
+            ),
+          );
         } else if (state is AuthErrorState) {
           context.showSnackBar(state.message, isError: true);
         }
       },
       child: Scaffold(
-        backgroundColor: AppTheme.brandPrimary,
+        backgroundColor: Colors.transparent,
+        extendBodyBehindAppBar: true,
         appBar: AppBar(
           backgroundColor: Colors.transparent,
           elevation: 0,
           leading: IconButton(
-            icon: const Icon(Icons.arrow_back, color: Colors.white),
+            icon: const Icon(Icons.arrow_back_ios_new_rounded, color: Colors.white),
             onPressed: () => context.pop(),
           ),
         ),
-        body: SafeArea(
+        body: Container(
+          decoration: const BoxDecoration(
+            gradient: AppTheme.heroGradientVertical,
+          ),
+          child: SafeArea(
           child: Column(
             children: [
               Padding(
@@ -267,7 +295,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                             .textTheme
                                             .bodyMedium
                                             ?.copyWith(
-                                                color: AppTheme.brandPrimary,
+                                                color: AppTheme.brandPink,
                                                 fontWeight: FontWeight.w700)),
                                   ),
                                 ],
@@ -284,6 +312,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
               ),
             ],
           ),
+        ),
         ),
       ),
     );

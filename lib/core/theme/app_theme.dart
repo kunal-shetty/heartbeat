@@ -3,17 +3,44 @@ import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class AppTheme {
-  // Brand Colors
-  static const Color brandPrimary = Color(0xFFF59E0B);
+  // ── Brand Gradient Colors (Pink → Orange → Yellow) ────────────────────────
+  static const Color brandPink = Color(0xFFEC4899);       // vibrant pink
+  static const Color brandPinkLight = Color(0xFFFCE7F3);
+  static const Color brandOrange = Color(0xFFF97316);     // orange midpoint
+  static const Color brandPrimary = Color(0xFFF59E0B);    // amber/yellow (primary)
   static const Color brandPrimaryDark = Color(0xFFD97706);
   static const Color brandPrimaryDeep = Color(0xFF92400E);
   static const Color brandPrimaryLight = Color(0xFFFDE68A);
-  static const Color brandPrimarySurface = Color(0xFFFEF3C7);
-  static const Color brandAccent = Color(0xFFEA580C);
-  static const Color brandAccentLight = Color(0xFFFED7AA);
-  static const Color brandAccentSurface = Color(0xFFFFF7ED);
+  static const Color brandPrimarySurface = Color(0xFFFFF7ED);
+  static const Color brandAccent = Color(0xFFEC4899);     // accent = pink
+  static const Color brandAccentLight = Color(0xFFFCE7F3);
+  static const Color brandAccentSurface = Color(0xFFFFF1F7);
 
-  // Neutral (Stone)
+  // ── Gradient Definitions ─────────────────────────────────────────────────
+  static const LinearGradient heroGradient = LinearGradient(
+    begin: Alignment.topLeft,
+    end: Alignment.bottomRight,
+    colors: [
+      Color(0xFFEC4899), // pink
+      Color(0xFFF97316), // orange
+      Color(0xFFF59E0B), // amber
+    ],
+    stops: [0.0, 0.55, 1.0],
+  );
+
+  static const LinearGradient heroGradientVertical = LinearGradient(
+    begin: Alignment.topCenter,
+    end: Alignment.bottomCenter,
+    colors: [
+      Color(0xFFDB2777), // deep pink
+      Color(0xFFEC4899), // pink
+      Color(0xFFF97316), // orange
+      Color(0xFFF59E0B), // amber
+    ],
+    stops: [0.0, 0.3, 0.7, 1.0],
+  );
+
+  // ── Neutral (Stone) ───────────────────────────────────────────────────────
   static const Color neutral900 = Color(0xFF1C1917);
   static const Color neutral800 = Color(0xFF292524);
   static const Color neutral700 = Color(0xFF44403C);
@@ -22,7 +49,7 @@ class AppTheme {
   static const Color neutral100 = Color(0xFFF5F5F4);
   static const Color neutralWhite = Color(0xFFFFFFFF);
 
-  // Semantic
+  // ── Semantic ──────────────────────────────────────────────────────────────
   static const Color statusOnline = Color(0xFF22C55E);
   static const Color statusInfo = Color(0xFF3B82F6);
   static const Color statusError = Color(0xFFEF4444);
@@ -62,8 +89,8 @@ class AppTheme {
         iconTheme: const IconThemeData(color: neutralWhite, size: 24),
         actionsIconTheme: const IconThemeData(color: neutralWhite, size: 24),
         systemOverlayStyle: const SystemUiOverlayStyle(
-          statusBarColor: brandPrimary,
-          statusBarIconBrightness: Brightness.dark,
+          statusBarColor: Colors.transparent,
+          statusBarIconBrightness: Brightness.light,
         ),
       ),
       bottomNavigationBarTheme: const BottomNavigationBarThemeData(
@@ -108,7 +135,7 @@ class AppTheme {
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(24),
-          borderSide: const BorderSide(color: brandPrimary, width: 1.5),
+          borderSide: const BorderSide(color: brandPink, width: 1.5),
         ),
         errorBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(24),
@@ -136,7 +163,7 @@ class AppTheme {
         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
       ),
       floatingActionButtonTheme: const FloatingActionButtonThemeData(
-        backgroundColor: brandAccent,
+        backgroundColor: brandPink,
         foregroundColor: neutralWhite,
         elevation: 4,
         shape: CircleBorder(),
@@ -174,7 +201,7 @@ class AppTheme {
       scaffoldBackgroundColor: neutral900,
       textTheme: _buildTextTheme(base.textTheme, const Color(0xFFFAFAF9)),
       appBarTheme: AppBarTheme(
-        backgroundColor: brandPrimaryDark,
+        backgroundColor: const Color(0xFF1C1917),
         foregroundColor: neutralWhite,
         elevation: 0,
         titleTextStyle: GoogleFonts.plusJakartaSans(
@@ -183,7 +210,7 @@ class AppTheme {
           color: neutralWhite,
         ),
         systemOverlayStyle: const SystemUiOverlayStyle(
-          statusBarColor: brandPrimaryDark,
+          statusBarColor: Colors.transparent,
           statusBarIconBrightness: Brightness.light,
         ),
       ),

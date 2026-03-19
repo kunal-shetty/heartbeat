@@ -5,7 +5,7 @@ abstract class AuthRepository {
   Future<void> signInWithPhone(String phone);
   Future<UserEntity> verifyOtp({required String phone, required String token});
   Future<UserEntity> signInWithEmail({required String email, required String password});
-  Future<UserEntity> signUpWithEmail({
+  Future<void> signUpWithEmail({
   required String email,
   required String password,
   required String username,

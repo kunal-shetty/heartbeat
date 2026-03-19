@@ -15,7 +15,7 @@ class AuthRepositoryImpl implements AuthRepository {
   Future<UserEntity> verifyOtp({required String phone, required String token}) =>
       _remote.verifyOtp(phone: phone, token: token);
 @override
-Future<UserEntity> signUpWithEmail({
+Future<void> signUpWithEmail({
   required String email,
   required String password,
   required String username,

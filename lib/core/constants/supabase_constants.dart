@@ -9,16 +9,22 @@ class SupabaseConstants {
   static const String chatParticipantsTable = 'chat_participants';
   static const String messagesTable = 'messages';
   static const String messageStatusTable = 'message_status';
+  static const String statusUpdatesTable = 'status_updates';
+  static const String statusViewsTable = 'status_views';
+  static const String callsTable = 'calls';
 
   // Storage buckets
   static const String avatarsBucket = 'avatars';
   static const String chatMediaBucket = 'chat-media';
   static const String groupIconsBucket = 'group-icons';
+  static const String statusMediaBucket = 'status-media';
 
   // Realtime channels
   static String chatChannel(String chatId) => 'chat:$chatId';
   static String presenceChannel(String chatId) => 'presence:$chatId';
+  static String callsChannel(String userId) => 'calls:$userId';
 }
+
 
 class AppConstants {
   static const int maxImageSizeMb = 20;
