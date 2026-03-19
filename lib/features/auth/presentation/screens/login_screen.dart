@@ -10,6 +10,7 @@ import '../widgets/auth_text_field.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
+
   @override
   State<LoginScreen> createState() => _LoginScreenState();
 }
@@ -18,23 +19,17 @@ class _LoginScreenState extends State<LoginScreen>
     with SingleTickerProviderStateMixin {
   late TabController _tabController;
   final _phoneController = TextEditingController();
-  final _emailController = TextEditingController();
-  final _passwordController = TextEditingController();
-  final _formKey = GlobalKey<FormState>();
-  bool _obscurePassword = true;
 
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 2, vsync: this);
+    _tabController = TabController(length: 1, vsync: this);
   }
 
   @override
   void dispose() {
     _tabController.dispose();
     _phoneController.dispose();
-    _emailController.dispose();
-    _passwordController.dispose();
     super.dispose();
   }
 
@@ -57,88 +52,174 @@ class _LoginScreenState extends State<LoginScreen>
         body: SafeArea(
           child: Column(
             children: [
-              // Hero header
-              Padding(
-                padding: const EdgeInsets.fromLTRB(24, 40, 24, 32),
-                child: Column(
-                  children: [
-                    const Icon(Icons.chat_bubble_rounded,
-                        color: Colors.white, size: 56)
-                        .animate()
-                        .scale(duration: 500.ms, curve: Curves.elasticOut),
-                    const SizedBox(height: 16),
-                    Text('Chatter',
-                        style: Theme.of(context)
-                            .textTheme
-                            .displayMedium
-                            ?.copyWith(color: Colors.white, fontWeight: FontWeight.w800))
-                        .animate()
-                        .fadeIn(delay: 200.ms)
-                        .slideY(begin: 0.3, end: 0),
-                    const SizedBox(height: 6),
-                    Text('Connect. Chat. Share.',
-                        style: Theme.of(context)
-                            .textTheme
-                            .bodyMedium
-                            ?.copyWith(color: Colors.white.withOpacity(0.85)))
-                        .animate()
-                        .fadeIn(delay: 350.ms),
-                  ],
+              // ── Hero Section ─────────────────────────────────────────────
+              Expanded(
+                flex: 5,
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 32),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      // App icon
+                      Container(
+                        width: 100,
+                        height: 100,
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(28),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withOpacity(0.18),
+                              blurRadius: 24,
+                              offset: const Offset(0, 10),
+                            ),
+                          ],
+                        ),
+                        child: const Icon(
+                          Icons.favorite_rounded,
+                          color: AppTheme.brandPrimary,
+                          size: 52,
+                        ),
+                      )
+                          .animate()
+                          .scale(duration: 600.ms, curve: Curves.elasticOut)
+                          .fadeIn(duration: 300.ms),
+                      const SizedBox(height: 28),
+                      Text(
+                        'Heartbeat',
+                        style: Theme.of(context).textTheme.displayLarge?.copyWith(
+                              color: Colors.white,
+                              fontWeight: FontWeight.w900,
+                              fontSize: 38,
+                              letterSpacing: -1,
+                            ),
+                      )
+                          .animate()
+                          .fadeIn(delay: 300.ms, duration: 400.ms)
+                          .slideY(begin: 0.3, end: 0),
+                      const SizedBox(height: 10),
+                      Text(
+                        'Stay connected with the people\nthat matter most.',
+                        textAlign: TextAlign.center,
+                        style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                              color: Colors.white.withOpacity(0.85),
+                              height: 1.5,
+                            ),
+                      ).animate().fadeIn(delay: 450.ms, duration: 400.ms),
+                    ],
+                  ),
                 ),
               ),
 
-              // Card
+              // ── Bottom Card ──────────────────────────────────────────────
               Expanded(
+                flex: 4,
                 child: Container(
                   width: double.infinity,
                   decoration: const BoxDecoration(
                     color: Colors.white,
-                    borderRadius: BorderRadius.vertical(top: Radius.circular(32)),
+                    borderRadius:
+                        BorderRadius.vertical(top: Radius.circular(36)),
                   ),
+                  padding: const EdgeInsets.fromLTRB(28, 32, 28, 24),
                   child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
-                      const SizedBox(height: 8),
-                      Container(
-                        width: 40,
-                        height: 4,
-                        decoration: BoxDecoration(
-                          color: AppTheme.neutral100,
-                          borderRadius: BorderRadius.circular(2),
+                      // Drag handle
+                      Center(
+                        child: Container(
+                          width: 40,
+                          height: 4,
+                          margin: const EdgeInsets.only(bottom: 28),
+                          decoration: BoxDecoration(
+                            color: AppTheme.neutral100,
+                            borderRadius: BorderRadius.circular(2),
+                          ),
                         ),
                       ),
-                      TabBar(
-                        controller: _tabController,
-                        labelColor: AppTheme.brandPrimary,
-                        unselectedLabelColor: AppTheme.neutral400,
-                        indicatorColor: AppTheme.brandPrimary,
-                        indicatorSize: TabBarIndicatorSize.label,
-                        labelStyle: Theme.of(context)
-                            .textTheme
-                            .titleSmall
-                            ?.copyWith(fontWeight: FontWeight.w600),
-                        tabs: const [
-                          Tab(text: 'Phone'),
-                          Tab(text: 'Email'),
-                        ],
-                      ),
-                      Expanded(
-                        child: TabBarView(
-                          controller: _tabController,
-                          children: [
-                            _PhoneTab(controller: _phoneController),
-                            _EmailTab(
-                              emailController: _emailController,
-                              passwordController: _passwordController,
-                              obscurePassword: _obscurePassword,
-                              onToggleObscure: () =>
-                                  setState(() => _obscurePassword = !_obscurePassword),
+
+                      Text(
+                        'Get Started',
+                        style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                              fontWeight: FontWeight.w800,
                             ),
-                          ],
+                      ).animate().fadeIn(delay: 300.ms),
+                      const SizedBox(height: 6),
+                      Text(
+                        'Sign in to your account or create a new one.',
+                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                              color: AppTheme.neutral400,
+                            ),
+                      ).animate().fadeIn(delay: 360.ms),
+                      const SizedBox(height: 28),
+
+                      // Sign In button
+                      ElevatedButton(
+                        onPressed: () => context.push(AppRoutes.signIn),
+                        style: ElevatedButton.styleFrom(
+                          minimumSize: const Size(double.infinity, 52),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(16),
+                          ),
                         ),
-                      ),
+                        child: const Text('Sign In'),
+                      ).animate().fadeIn(delay: 420.ms).scale(
+                          delay: 420.ms,
+                          duration: 300.ms,
+                          curve: Curves.easeOut),
+                      const SizedBox(height: 14),
+
+                      // Create Account button
+                      OutlinedButton(
+                        onPressed: () => context.push(AppRoutes.register),
+                        style: OutlinedButton.styleFrom(
+                          minimumSize: const Size(double.infinity, 52),
+                          side: const BorderSide(
+                              color: AppTheme.brandPrimary, width: 1.5),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(16),
+                          ),
+                          foregroundColor: AppTheme.brandPrimary,
+                        ),
+                        child: Text(
+                          'Create Account',
+                          style:
+                              Theme.of(context).textTheme.titleSmall?.copyWith(
+                                    color: AppTheme.brandPrimary,
+                                    fontWeight: FontWeight.w700,
+                                  ),
+                        ),
+                      ).animate().fadeIn(delay: 480.ms),
+                      const SizedBox(height: 20),
+
+                      // Google sign in
+                      OutlinedButton.icon(
+                        onPressed: () {
+                          context
+                              .read<AuthBloc>()
+                              .add(AuthSignInWithGoogleEvent());
+                        },
+                        style: OutlinedButton.styleFrom(
+                          minimumSize: const Size(double.infinity, 52),
+                          side: BorderSide(
+                              color: AppTheme.neutral400.withOpacity(0.35)),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(16),
+                          ),
+                        ),
+                        icon: const Icon(Icons.g_mobiledata,
+                            size: 28, color: AppTheme.brandAccent),
+                        label: Text(
+                          'Continue with Google',
+                          style: Theme.of(context)
+                              .textTheme
+                              .titleSmall
+                              ?.copyWith(color: AppTheme.neutral800),
+                        ),
+                      ).animate().fadeIn(delay: 520.ms),
                     ],
                   ),
-                ).animate().slideY(begin: 0.2, end: 0, duration: 400.ms, delay: 100.ms),
+                ).animate().slideY(begin: 0.25, end: 0, duration: 450.ms, delay: 100.ms),
               ),
             ],
           ),
@@ -148,6 +229,7 @@ class _LoginScreenState extends State<LoginScreen>
   }
 }
 
+/// Phone-based OTP tab – kept for re-use if extended later
 class _PhoneTab extends StatelessWidget {
   final TextEditingController controller;
   const _PhoneTab({required this.controller});
@@ -188,7 +270,8 @@ class _PhoneTab extends StatelessWidget {
                           context.read<AuthBloc>().add(
                               AuthSignInWithPhoneEvent(controller.text.trim()));
                         } else {
-                          context.showSnackBar('Enter a valid phone number', isError: true);
+                          context.showSnackBar('Enter a valid phone number',
+                              isError: true);
                         }
                       },
                 child: isLoading
@@ -199,107 +282,10 @@ class _PhoneTab extends StatelessWidget {
                             color: Colors.white, strokeWidth: 2))
                     : const Text('Send OTP'),
               ),
-              const SizedBox(height: 20),
-              _GoogleButton(),
             ],
           ),
         );
       },
-    );
-  }
-}
-
-class _EmailTab extends StatelessWidget {
-  final TextEditingController emailController, passwordController;
-  final bool obscurePassword;
-  final VoidCallback onToggleObscure;
-
-  const _EmailTab({
-    required this.emailController,
-    required this.passwordController,
-    required this.obscurePassword,
-    required this.onToggleObscure,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return BlocBuilder<AuthBloc, AuthState>(
-      builder: (context, state) {
-        final isLoading = state is AuthLoadingState;
-        return Padding(
-          padding: const EdgeInsets.all(24),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              const SizedBox(height: 8),
-              AuthTextField(
-                controller: emailController,
-                hint: 'you@example.com',
-                prefixIcon: Icons.email_outlined,
-                keyboardType: TextInputType.emailAddress,
-                label: 'Email',
-              ),
-              const SizedBox(height: 16),
-              AuthTextField(
-                controller: passwordController,
-                hint: '••••••••',
-                prefixIcon: Icons.lock_outline,
-                obscureText: obscurePassword,
-                label: 'Password',
-                suffixIcon: IconButton(
-                  icon: Icon(
-                    obscurePassword ? Icons.visibility_off : Icons.visibility,
-                    color: AppTheme.neutral400,
-                    size: 20,
-                  ),
-                  onPressed: onToggleObscure,
-                ),
-              ),
-              const SizedBox(height: 20),
-              ElevatedButton(
-                onPressed: isLoading
-                    ? null
-                    : () => context.read<AuthBloc>().add(
-                          AuthSignInWithEmailEvent(
-                            email: emailController.text.trim(),
-                            password: passwordController.text,
-                          ),
-                        ),
-                child: isLoading
-                    ? const SizedBox(
-                        width: 20,
-                        height: 20,
-                        child: CircularProgressIndicator(
-                            color: Colors.white, strokeWidth: 2))
-                    : const Text('Sign In'),
-              ),
-              const SizedBox(height: 20),
-              _GoogleButton(),
-            ],
-          ),
-        );
-      },
-    );
-  }
-}
-
-class _GoogleButton extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return OutlinedButton.icon(
-      onPressed: () =>
-          context.read<AuthBloc>().add(AuthSignInWithGoogleEvent()),
-      style: OutlinedButton.styleFrom(
-        minimumSize: const Size(double.infinity, 48),
-        side: BorderSide(color: AppTheme.neutral400.withOpacity(0.5)),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-      ),
-      icon: const Icon(Icons.g_mobiledata, size: 24, color: AppTheme.brandAccent),
-      label: Text('Continue with Google',
-          style: Theme.of(context)
-              .textTheme
-              .titleSmall
-              ?.copyWith(color: AppTheme.neutral800)),
     );
   }
 }

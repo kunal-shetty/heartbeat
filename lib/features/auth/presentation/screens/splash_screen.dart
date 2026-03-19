@@ -50,7 +50,7 @@ class SplashScreen extends StatelessWidget {
                   .fadeIn(duration: 300.ms),
               const SizedBox(height: 20),
               Text(
-                'Chatter',
+               'Heartbeat',
                 style: Theme.of(context).textTheme.displayMedium?.copyWith(
                       color: Colors.white,
                       fontWeight: FontWeight.w800,
@@ -62,7 +62,7 @@ class SplashScreen extends StatelessWidget {
                   .slideY(begin: 0.3, end: 0),
               const SizedBox(height: 8),
               Text(
-                'Real-time messaging',
+                'Connect. Chat. Share.',
                 style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                       color: Colors.white.withOpacity(0.8),
                     ),

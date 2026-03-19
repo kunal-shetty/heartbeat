@@ -7,6 +7,7 @@ import 'features/auth/domain/repositories/auth_repository.dart';
 import 'features/auth/domain/usecases/sign_in_with_phone.dart';
 import 'features/auth/domain/usecases/sign_in_with_google.dart';
 import 'features/auth/domain/usecases/sign_in_with_email.dart';
+import 'features/auth/domain/usecases/sign_up_with_email.dart';
 import 'features/auth/domain/usecases/verify_otp.dart';
 import 'features/auth/domain/usecases/sign_out.dart';
 import 'features/auth/domain/usecases/get_current_user.dart';
@@ -53,6 +54,7 @@ Future<void> init() async {
   sl.registerLazySingleton(() => SignInWithPhone(sl()));
   sl.registerLazySingleton(() => SignInWithGoogle(sl()));
   sl.registerLazySingleton(() => SignInWithEmail(sl()));
+  sl.registerLazySingleton(() => SignUpWithEmail(sl()));
   sl.registerLazySingleton(() => VerifyOtp(sl()));
   sl.registerLazySingleton(() => SignOut(sl()));
   sl.registerLazySingleton(() => GetCurrentUser(sl()));
@@ -60,6 +62,7 @@ Future<void> init() async {
         signInWithPhone: sl(),
         signInWithGoogle: sl(),
         signInWithEmail: sl(),
+        signUpWithEmail: sl(),
         verifyOtp: sl(),
         signOut: sl(),
         getCurrentUser: sl(),

@@ -6,6 +6,7 @@ import '../../features/auth/presentation/blocs/auth_bloc.dart';
 import '../../features/auth/presentation/screens/splash_screen.dart';
 import '../../features/auth/presentation/screens/login_screen.dart';
 import '../../features/auth/presentation/screens/otp_screen.dart';
+import '../../features/auth/presentation/screens/signin_screen.dart';
 import '../../features/auth/presentation/screens/register_screen.dart';
 import '../../features/chat/presentation/screens/chat_list_screen.dart';
 import '../../features/chat/presentation/screens/chat_screen.dart';
@@ -20,6 +21,7 @@ import '../errors/failure.dart';
 class AppRoutes {
   static const splash = '/';
   static const login = '/login';
+  static const signIn = '/signin';
   static const otp = '/otp';
   static const register = '/register';
   static const chatList = '/chats';
@@ -42,6 +44,7 @@ class AppRouter {
       final authBloc = context.read<AuthBloc>();
       final isAuthenticated = authBloc.state is AuthAuthenticatedState;
       final isOnAuthPage = state.matchedLocation == AppRoutes.login ||
+          state.matchedLocation == AppRoutes.signIn ||
           state.matchedLocation == AppRoutes.otp ||
           state.matchedLocation == AppRoutes.register ||
           state.matchedLocation == AppRoutes.splash;
@@ -66,6 +69,10 @@ class AppRouter {
         builder: (_, state) => OtpScreen(
           phone: state.extra as String? ?? '',
         ),
+      ),
+      GoRoute(
+        path: AppRoutes.signIn,
+        builder: (_, __) => const SignInScreen(),
       ),
       GoRoute(
         path: AppRoutes.register,

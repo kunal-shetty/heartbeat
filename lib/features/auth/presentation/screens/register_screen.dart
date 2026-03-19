@@ -86,7 +86,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         .animate()
                         .fadeIn(delay: 150.ms),
                     const SizedBox(height: 6),
-                    Text('Fill in your details to get started.',
+                    Text('Join Heartbeat and start connecting.',
                             style: Theme.of(context)
                                 .textTheme
                                 .bodyMedium
@@ -261,7 +261,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                           ?.copyWith(
                                               color: AppTheme.neutral600)),
                                   GestureDetector(
-                                    onTap: () => context.pop(),
+                                    onTap: () => context.push(AppRoutes.signIn),
                                     child: Text('Sign In',
                                         style: Theme.of(context)
                                             .textTheme

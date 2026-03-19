@@ -60,7 +60,7 @@ class ChatterApp extends StatelessWidget {
         BlocProvider<ChatListBloc>(create: (_) => di.sl<ChatListBloc>()),
       ],
       child: MaterialApp.router(
-        title: 'Chatter',
+        title: 'Heartbeat',
         debugShowCheckedModeBanner: false,
         theme: AppTheme.lightTheme,
         darkTheme: AppTheme.darkTheme,
