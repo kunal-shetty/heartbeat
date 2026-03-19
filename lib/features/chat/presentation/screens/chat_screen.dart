@@ -191,69 +191,87 @@ class _ChatAppBar extends StatelessWidget implements PreferredSizeWidget {
 
   @override
   Widget build(BuildContext context) {
-    return AppBar(
-      titleSpacing: 0,
-      leading: IconButton(
-        icon: const Icon(Icons.arrow_back),
-        onPressed: () => context.pop(),
-      ),
-      title: InkWell(
-        onTap: () {
-          if (isGroup) context.push('/group-info/$chatId');
-        },
-        child: Row(
-          children: [
-            UserAvatar(
-              name: chatName,
-              avatarUrl: chatData?['chatAvatar'] as String?,
-              size: 36,
-              isOnline: isOnline,
-              isGroup: isGroup,
+    return PreferredSize(
+      preferredSize: const Size.fromHeight(kToolbarHeight),
+      child: Container(
+        decoration: const BoxDecoration(gradient: AppTheme.heroGradient),
+        child: AppBar(
+          backgroundColor: Colors.transparent,
+          elevation: 0,
+          titleSpacing: 0,
+          leading: IconButton(
+            icon: const Icon(Icons.arrow_back_ios_new_rounded, color: Colors.white),
+            onPressed: () => context.pop(),
+          ),
+          title: InkWell(
+            onTap: () {
+              if (isGroup) context.push('/group-info/$chatId');
+            },
+            child: Row(
+              children: [
+                UserAvatar(
+                  name: chatName,
+                  avatarUrl: chatData?['chatAvatar'] as String?,
+                  size: 36,
+                  isOnline: isOnline,
+                  isGroup: isGroup,
+                ),
+                const SizedBox(width: 10),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(
+                        chatName,
+                        style: const TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w700,
+                            color: Colors.white),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                      Text(
+                        isOnline ? '● online' : 'tap for info',
+                        style: TextStyle(
+                          fontSize: 11,
+                          color: isOnline
+                              ? const Color(0xFF86EFAC)
+                              : Colors.white.withOpacity(0.75),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
             ),
-            const SizedBox(width: 10),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Text(
-                    chatName,
-                    style: const TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w700,
-                        color: Colors.white),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                  Text(
-                    isOnline ? 'online' : 'tap for info',
-                    style: TextStyle(
-                      fontSize: 12,
-                      color: Colors.white.withOpacity(0.85),
-                    ),
-                  ),
-                ],
-              ),
+          ),
+          actions: [
+            IconButton(
+              icon: const Icon(Icons.call_outlined, color: Colors.white),
+              onPressed: () => context.push('/call/$chatId', extra: {
+                'isVideo': false,
+                'chatName': chatName,
+                'avatarUrl': chatData?['chatAvatar'],
+                'calleeId': chatData?['otherUserId'],
+              }),
+            ),
+            IconButton(
+              icon: const Icon(Icons.videocam_outlined, color: Colors.white),
+              onPressed: () => context.push('/call/$chatId', extra: {
+                'isVideo': true,
+                'chatName': chatName,
+                'avatarUrl': chatData?['chatAvatar'],
+                'calleeId': chatData?['otherUserId'],
+              }),
+            ),
+            IconButton(
+              icon: const Icon(Icons.more_vert, color: Colors.white),
+              onPressed: () => _showOptions(context),
             ),
           ],
         ),
       ),
-      actions: [
-        IconButton(
-          icon: const Icon(Icons.call_outlined),
-          onPressed: () => context.push('/call/$chatId',
-              extra: {'isVideo': false, 'chatName': chatName}),
-        ),
-        IconButton(
-          icon: const Icon(Icons.videocam_outlined),
-          onPressed: () => context.push('/call/$chatId',
-              extra: {'isVideo': true, 'chatName': chatName}),
-        ),
-        IconButton(
-          icon: const Icon(Icons.more_vert),
-          onPressed: () => _showOptions(context),
-        ),
-      ],
     );
   }
 

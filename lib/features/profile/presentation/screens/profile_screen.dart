@@ -56,36 +56,48 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
           return Scaffold(
             backgroundColor: AppTheme.neutral100,
-            appBar: widget.isTab
-                ? AppBar(
-                    title: const Text('Settings'),
-                    actions: [
-                      if (displayUser != null)
-                        TextButton(
-                          onPressed: () => context.push(AppRoutes.editProfile),
-                          child: const Text('Edit',
-                              style: TextStyle(
-                                  color: Colors.white,
-                                  fontWeight: FontWeight.w600)),
+            appBar: PreferredSize(
+              preferredSize: const Size.fromHeight(kToolbarHeight),
+              child: Container(
+                decoration: const BoxDecoration(gradient: AppTheme.heroGradient),
+                child: widget.isTab
+                    ? AppBar(
+                        backgroundColor: Colors.transparent,
+                        elevation: 0,
+                        title: const Text('Settings',
+                            style: TextStyle(color: Colors.white, fontWeight: FontWeight.w800)),
+                        actions: [
+                          if (displayUser != null)
+                            TextButton(
+                              onPressed: () => context.push(AppRoutes.editProfile),
+                              child: const Text('Edit',
+                                  style: TextStyle(
+                                      color: Colors.white,
+                                      fontWeight: FontWeight.w600)),
+                            ),
+                        ],
+                      )
+                    : AppBar(
+                        backgroundColor: Colors.transparent,
+                        elevation: 0,
+                        title: const Text('Profile',
+                            style: TextStyle(color: Colors.white, fontWeight: FontWeight.w800)),
+                        leading: IconButton(
+                          icon: const Icon(Icons.arrow_back_ios_new_rounded, color: Colors.white),
+                          onPressed: () => context.pop(),
                         ),
-                    ],
-                  )
-                : AppBar(
-                    title: const Text('Profile'),
-                    leading: IconButton(
-                      icon: const Icon(Icons.arrow_back),
-                      onPressed: () => context.pop(),
-                    ),
-                    actions: [
-                      TextButton(
-                        onPressed: () => context.push(AppRoutes.editProfile),
-                        child: const Text('Edit',
-                            style: TextStyle(
-                                color: Colors.white,
-                                fontWeight: FontWeight.w600)),
+                        actions: [
+                          TextButton(
+                            onPressed: () => context.push(AppRoutes.editProfile),
+                            child: const Text('Edit',
+                                style: TextStyle(
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.w600)),
+                          ),
+                        ],
                       ),
-                    ],
-                  ),
+              ),
+            ),
             body: displayUser == null
                 ? const Center(
                     child: CircularProgressIndicator(
@@ -93,10 +105,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 : SingleChildScrollView(
                     child: Column(
                       children: [
-                        // Header
+                        // Header with gradient
                         Container(
                           width: double.infinity,
-                          color: AppTheme.brandPrimary,
+                          decoration: const BoxDecoration(
+                            gradient: AppTheme.heroGradientVertical,
+                          ),
                           padding: const EdgeInsets.fromLTRB(0, 20, 0, 32),
                           child: Column(
                             children: [
@@ -111,17 +125,20 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                   Positioned(
                                     bottom: 0,
                                     right: 0,
-                                    child: Container(
-                                      width: 28,
-                                      height: 28,
-                                      decoration: BoxDecoration(
-                                        color: AppTheme.brandAccent,
-                                        shape: BoxShape.circle,
-                                        border: Border.all(
-                                            color: Colors.white, width: 2),
+                                    child: GestureDetector(
+                                      onTap: () => context.push(AppRoutes.editProfile),
+                                      child: Container(
+                                        width: 28,
+                                        height: 28,
+                                        decoration: BoxDecoration(
+                                          gradient: AppTheme.heroGradient,
+                                          shape: BoxShape.circle,
+                                          border: Border.all(
+                                              color: Colors.white, width: 2),
+                                        ),
+                                        child: const Icon(Icons.camera_alt,
+                                            size: 14, color: Colors.white),
                                       ),
-                                      child: const Icon(Icons.camera_alt,
-                                          size: 14, color: Colors.white),
                                     ),
                                   ),
                                 ],
@@ -140,7 +157,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                               Text(
                                 displayUser.phone ??
                                     displayUser.email ??
-                                    '@${displayUser.username}',
+                                    '@\${displayUser.username}',
                                 style: Theme.of(context)
                                     .textTheme
                                     .bodyMedium

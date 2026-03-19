@@ -114,11 +114,20 @@ class _NewChatScreenState extends State<NewChatScreen> {
 
     return Scaffold(
       backgroundColor: Colors.white,
-      appBar: AppBar(
-        title: const Text('New Chat'),
-        leading: IconButton(
-          icon: const Icon(Icons.close),
-          onPressed: () => context.pop(),
+      appBar: PreferredSize(
+        preferredSize: const Size.fromHeight(kToolbarHeight),
+        child: Container(
+          decoration: const BoxDecoration(gradient: AppTheme.heroGradient),
+          child: AppBar(
+            backgroundColor: Colors.transparent,
+            elevation: 0,
+            title: const Text('New Chat',
+                style: TextStyle(color: Colors.white, fontWeight: FontWeight.w800)),
+            leading: IconButton(
+              icon: const Icon(Icons.close, color: Colors.white),
+              onPressed: () => context.pop(),
+            ),
+          ),
         ),
       ),
       body: Column(
