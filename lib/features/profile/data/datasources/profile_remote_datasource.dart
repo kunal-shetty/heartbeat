@@ -44,20 +44,40 @@ class ProfileRemoteDataSourceImpl implements ProfileRemoteDataSource {
     try {
       String? avatarUrl;
 
-      if (avatarPath != null) {
-        final ext = avatarPath.split('.').last;
-        final path = '$userId/avatar.$ext';
-        await _client.storage
-            .from(SupabaseConstants.avatarsBucket)
-            .upload(path, File(avatarPath),
-                fileOptions: const FileOptions(upsert: true));
-        avatarUrl = _client.storage
-            .from(SupabaseConstants.avatarsBucket)
-            .getPublicUrl(path);
+      // Only attempt upload if a local file path was given
+      if (avatarPath != null && avatarPath.isNotEmpty) {
+        try {
+          final file = File(avatarPath);
+          final ext = avatarPath.split('.').last.toLowerCase();
+          final storagePath = '$userId/avatar.$ext';
+
+          await _client.storage
+              .from(SupabaseConstants.avatarsBucket)
+              .upload(storagePath, file,
+                  fileOptions: const FileOptions(
+                      upsert: true, contentType: 'image/jpeg'));
+
+          // Public URL with a cache-bust so the new image is shown immediately
+          avatarUrl =
+              '${_client.storage.from(SupabaseConstants.avatarsBucket).getPublicUrl(storagePath)}'
+              '?t=${DateTime.now().millisecondsSinceEpoch}';
+        } catch (uploadErr) {
+          // Log upload error but continue saving other fields
+          // The error message shown to user is handled in the UI layer
+          final msg = uploadErr.toString().toLowerCase();
+          if (msg.contains('policy') ||
+              msg.contains('permission') ||
+              msg.contains('rls')) {
+            throw ServerFailure(
+                'Photo upload blocked — please run the database migration first.');
+          }
+          throw ServerFailure('Photo upload failed. Check your connection.');
+        }
       }
 
       final updates = <String, dynamic>{
-        if (displayName != null) 'display_name': displayName,
+        if (displayName != null && displayName.isNotEmpty)
+          'display_name': displayName,
         if (statusMsg != null) 'status_msg': statusMsg,
         if (avatarUrl != null) 'avatar_url': avatarUrl,
       };
@@ -71,10 +91,18 @@ class ProfileRemoteDataSourceImpl implements ProfileRemoteDataSource {
           .select()
           .single();
       return _map(data);
+    } on ServerFailure {
+      rethrow;
     } catch (e) {
-      throw ServerFailure(e.toString());
+      // Don't expose raw Supabase exception — clean message only
+      final msg = e.toString().toLowerCase();
+      if (msg.contains('network') || msg.contains('socket')) {
+        throw ServerFailure('No internet connection. Please try again.');
+      }
+      throw ServerFailure('Could not save profile. Please try again.');
     }
   }
+
 
   @override
   Future<void> updateOnlineStatus({

@@ -41,18 +41,31 @@ class AppRouter {
     navigatorKey: _rootNavigatorKey,
     initialLocation: AppRoutes.splash,
     redirect: (context, state) {
-      final authBloc = context.read<AuthBloc>();
-      final isAuthenticated = authBloc.state is AuthAuthenticatedState;
-      final isOnAuthPage = state.matchedLocation == AppRoutes.login ||
-          state.matchedLocation == AppRoutes.signIn ||
-          state.matchedLocation == AppRoutes.otp ||
-          state.matchedLocation == AppRoutes.register ||
-          state.matchedLocation == AppRoutes.splash;
+      final authState = context.read<AuthBloc>().state;
+      final location = state.matchedLocation;
 
-      if (!isAuthenticated && !isOnAuthPage) return AppRoutes.login;
-      if (isAuthenticated && isOnAuthPage && state.matchedLocation != AppRoutes.splash) {
+      // Auth pages that unauthenticated users can visit
+      final isAuthPage = location == AppRoutes.login ||
+          location == AppRoutes.signIn ||
+          location == AppRoutes.otp ||
+          location == AppRoutes.register ||
+          location == AppRoutes.splash;
+
+      // While loading/initial, stay on splash — don't redirect yet
+      if (authState is AuthInitialState || authState is AuthLoadingState) {
+        return location == AppRoutes.splash ? null : AppRoutes.splash;
+      }
+
+      final isAuthenticated = authState is AuthAuthenticatedState;
+
+      // Unauthenticated user trying to access protected route → login
+      if (!isAuthenticated && !isAuthPage) return AppRoutes.login;
+
+      // Authenticated user on auth pages → chats
+      if (isAuthenticated && isAuthPage && location != AppRoutes.splash) {
         return AppRoutes.chatList;
       }
+
       return null;
     },
     routes: [

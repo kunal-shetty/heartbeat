@@ -1,5 +1,7 @@
+import 'dart:async';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:equatable/equatable.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../domain/entities/user_entity.dart';
 import '../../domain/usecases/sign_in_with_phone.dart';
 import '../../domain/usecases/sign_in_with_google.dart';
@@ -125,6 +127,13 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
   final SignOut signOut;
   final GetCurrentUser getCurrentUser;
 
+  // Rate limiting: track last auth attempt time
+  DateTime? _lastAuthAttempt;
+  static const _rateLimitDuration = Duration(seconds: 2);
+
+  // Auth state subscription (keeps bloc alive to Supabase session changes)
+  StreamSubscription<AuthState>? _authSubscription;
+
   AuthBloc({
     required this.signInWithPhone,
     required this.signInWithGoogle,
@@ -141,25 +150,107 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     on<AuthSignUpWithEmailEvent>(_onSignUpWithEmail);
     on<AuthSignInWithGoogleEvent>(_onSignInWithGoogle);
     on<AuthSignOutEvent>(_onSignOut);
+
+    // ── Listen to Supabase auth state changes ─────────────────────────────
+    // This ensures session restore after app restart is handled automatically.
+    Supabase.instance.client.auth.onAuthStateChange.listen((data) {
+      final event = data.event;
+      final session = data.session;
+
+      if (event == AuthChangeEvent.signedIn && session != null) {
+        // Session was restored from storage OR user just signed in.
+        // Only fire if we're not already in an authenticated state to avoid
+        // duplicate loads.
+        if (state is! AuthAuthenticatedState && state is! AuthLoadingState) {
+          add(AuthCheckStatusEvent());
+        }
+      } else if (event == AuthChangeEvent.signedOut) {
+        if (state is! AuthUnauthenticatedState) {
+          emit(AuthUnauthenticatedState());
+        }
+      } else if (event == AuthChangeEvent.tokenRefreshed && session != null) {
+        // Session token refreshed silently — no UI change needed.
+      }
+    });
   }
+
+  bool _isRateLimited() {
+    if (_lastAuthAttempt == null) return false;
+    return DateTime.now().difference(_lastAuthAttempt!) < _rateLimitDuration;
+  }
+
+  void _recordAuthAttempt() => _lastAuthAttempt = DateTime.now();
+
+  // ── Check persisted session (called on app start from SplashScreen) ──────
 
   Future<void> _onCheckStatus(
       AuthCheckStatusEvent event, Emitter<AuthState> emit) async {
     emit(AuthLoadingState());
     try {
+      // First check if there is a live Supabase session (persisted on disk).
+      final session = Supabase.instance.client.auth.currentSession;
+      if (session == null) {
+        emit(AuthUnauthenticatedState());
+        return;
+      }
+
+      // Session exists — try to load the public profile.
       final user = await getCurrentUser();
       if (user != null) {
         emit(AuthAuthenticatedState(user));
       } else {
-        emit(AuthUnauthenticatedState());
+        // We have a valid auth session but no profile row yet (e.g., trigger
+        // ran but RLS migration not done yet). Build a minimal entity from
+        // the auth user so the user is not forced to re-login.
+        final authUser = Supabase.instance.client.auth.currentUser!;
+        final meta = authUser.userMetadata ?? {};
+        final email = authUser.email ?? '';
+        final username = (meta['username'] as String?) ??
+            email.split('@').first.replaceAll(RegExp(r'[^a-zA-Z0-9_]'), '_');
+
+        emit(AuthAuthenticatedState(UserEntity(
+          id: authUser.id,
+          email: email,
+          username: username,
+          displayName: (meta['display_name'] as String?) ?? username,
+          statusMsg: 'Hey there! I am using Heartbeat.',
+          isOnline: true,
+          createdAt: DateTime.now(),
+        )));
       }
     } catch (_) {
-      emit(AuthUnauthenticatedState());
+      // Even on network failure, if there's a session keep the user logged in.
+      final session = Supabase.instance.client.auth.currentSession;
+      if (session != null) {
+        final authUser = Supabase.instance.client.auth.currentUser!;
+        final meta = authUser.userMetadata ?? {};
+        final email = authUser.email ?? '';
+        final username = (meta['username'] as String?) ??
+            email.split('@').first.replaceAll(RegExp(r'[^a-zA-Z0-9_]'), '_');
+        emit(AuthAuthenticatedState(UserEntity(
+          id: authUser.id,
+          email: email,
+          username: username,
+          displayName: (meta['display_name'] as String?) ?? username,
+          statusMsg: 'Hey there! I am using Heartbeat.',
+          isOnline: true,
+          createdAt: DateTime.now(),
+        )));
+      } else {
+        emit(AuthUnauthenticatedState());
+      }
     }
   }
 
+  // ── Phone ─────────────────────────────────────────────────────────────────
+
   Future<void> _onSignInWithPhone(
       AuthSignInWithPhoneEvent event, Emitter<AuthState> emit) async {
+    if (_isRateLimited()) {
+      emit(AuthErrorState('Please wait a moment before trying again.'));
+      return;
+    }
+    _recordAuthAttempt();
     emit(AuthLoadingState());
     try {
       await signInWithPhone(event.phone);
@@ -175,11 +266,16 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       AuthVerifyOtpEvent event, Emitter<AuthState> emit) async {
     emit(AuthLoadingState());
     try {
-      final user = await verifyOtp(phone: event.phone, token: event.token);
+      final user =
+          await verifyOtp(phone: event.phone, token: event.token);
       emit(AuthAuthenticatedState(user));
     } on AuthFailure catch (e) {
       if (e.message == 'NEW_USER') {
-        emit(AuthNewUserState(phone: event.phone, userId: ''));
+        final authUser = Supabase.instance.client.auth.currentUser;
+        emit(AuthNewUserState(
+          userId: authUser?.id ?? '',
+          phone: event.phone,
+        ));
       } else {
         emit(AuthErrorState(e.message));
       }
@@ -188,8 +284,15 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     }
   }
 
+  // ── Email Sign-In ─────────────────────────────────────────────────────────
+
   Future<void> _onSignInWithEmail(
       AuthSignInWithEmailEvent event, Emitter<AuthState> emit) async {
+    if (_isRateLimited()) {
+      emit(AuthErrorState('Please wait a moment before trying again.'));
+      return;
+    }
+    _recordAuthAttempt();
     emit(AuthLoadingState());
     try {
       final user = await signInWithEmail(
@@ -204,8 +307,15 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     }
   }
 
+  // ── Email Sign-Up ─────────────────────────────────────────────────────────
+
   Future<void> _onSignUpWithEmail(
       AuthSignUpWithEmailEvent event, Emitter<AuthState> emit) async {
+    if (_isRateLimited()) {
+      emit(AuthErrorState('Please wait a moment before trying again.'));
+      return;
+    }
+    _recordAuthAttempt();
     emit(AuthLoadingState());
     try {
       await signUpWithEmail(
@@ -214,19 +324,15 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
         username: event.username,
         displayName: event.displayName,
       );
-      // signUpWithEmail returns void; if no exception was thrown and we reach
-      // here it means the user was created AND a session was established
-      // (email confirmation is disabled). Try to get the current user.
+      // If we reach here, no exception was thrown → session established.
       final user = await getCurrentUser();
       if (user != null) {
         emit(AuthAuthenticatedState(user));
       } else {
-        // Should not happen, but fallback
         emit(AuthSignUpPendingState());
       }
     } on AuthFailure catch (e) {
       if (e.message == 'SIGNUP_PENDING') {
-        // Email confirmation required — tell user to sign in after confirming.
         emit(AuthSignUpPendingState());
       } else {
         emit(AuthErrorState(e.message));
@@ -236,26 +342,38 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     }
   }
 
+  // ── Google ────────────────────────────────────────────────────────────────
+
   Future<void> _onSignInWithGoogle(
       AuthSignInWithGoogleEvent event, Emitter<AuthState> emit) async {
     emit(AuthLoadingState());
     try {
       await signInWithGoogle();
-      // Session will be picked up via authStateChanges deep-link callback
-      // For now emit unauthenticated so UI can respond if needed
+      // OAuth result arrives via deep link → authStateChanges listener handles it
       emit(AuthUnauthenticatedState());
     } on AuthFailure catch (e) {
       emit(AuthErrorState(e.message));
-    } catch (e) {
-      emit(AuthErrorState('Google sign in failed. Try again.'));
+    } catch (_) {
+      emit(AuthErrorState('Google sign-in failed. Try again.'));
     }
   }
 
+  // ── Sign-Out ──────────────────────────────────────────────────────────────
+
   Future<void> _onSignOut(
       AuthSignOutEvent event, Emitter<AuthState> emit) async {
+    emit(AuthLoadingState());
     try {
       await signOut();
-    } catch (_) {}
-    emit(AuthUnauthenticatedState());
+      emit(AuthUnauthenticatedState());
+    } catch (_) {
+      emit(AuthUnauthenticatedState());
+    }
+  }
+
+  @override
+  Future<void> close() {
+    _authSubscription?.cancel();
+    return super.close();
   }
 }

@@ -125,6 +125,13 @@ class AppTheme {
       inputDecorationTheme: InputDecorationTheme(
         filled: true,
         fillColor: brandPrimarySurface,
+        // Explicit text color so typed text is always dark, even inside
+        // gradient containers that might otherwise inherit white foreground.
+        labelStyle: GoogleFonts.plusJakartaSans(
+          fontSize: 14,
+          color: neutral700,
+          fontWeight: FontWeight.w500,
+        ),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(24),
           borderSide: BorderSide.none,

@@ -220,9 +220,15 @@ class _ChatsTab extends StatelessWidget {
             child: TextField(
               controller: searchController,
               onChanged: onSearchChanged,
-              style: Theme.of(context).textTheme.bodyMedium,
+              // Always use dark text so it's visible on the white/light gray background
+              style: const TextStyle(
+                color: AppTheme.neutral900,
+                fontSize: 14,
+              ),
+              cursorColor: AppTheme.brandPink,
               decoration: InputDecoration(
                 hintText: 'Search chats...',
+                hintStyle: const TextStyle(color: AppTheme.neutral400),
                 prefixIcon: const Icon(Icons.search,
                     size: 20, color: AppTheme.neutral400),
                 suffixIcon: searchQuery.isNotEmpty

@@ -138,8 +138,14 @@ class _NewChatScreenState extends State<NewChatScreen> {
             child: TextField(
               controller: _searchController,
               autofocus: true,
+              style: const TextStyle(
+                color: AppTheme.neutral900,
+                fontSize: 14,
+              ),
+              cursorColor: AppTheme.brandPink,
               decoration: InputDecoration(
                 hintText: 'Search contacts',
+                hintStyle: const TextStyle(color: AppTheme.neutral400),
                 prefixIcon:
                     const Icon(Icons.search, size: 20, color: AppTheme.neutral400),
                 filled: true,
@@ -155,7 +161,7 @@ class _NewChatScreenState extends State<NewChatScreen> {
                 focusedBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(22),
                   borderSide:
-                      const BorderSide(color: AppTheme.brandPrimary, width: 1),
+                      const BorderSide(color: AppTheme.brandPink, width: 1.5),
                 ),
                 contentPadding: const EdgeInsets.symmetric(vertical: 10),
               ),
